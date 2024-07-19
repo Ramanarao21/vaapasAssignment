@@ -19,6 +19,10 @@ const SearchBar = ({ onSearchResults }) => {
     setNoResults(false);
     try {
       const response = await fetch(`https://openlibrary.org/search.json?title=${searchTerm}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       const data = await response.json();
       const filteredMovies = data.docs.filter(movie => movie.title);
       if (filteredMovies.length === 0) {
@@ -27,7 +31,7 @@ const SearchBar = ({ onSearchResults }) => {
 
       } else {
         // setNoResults(false);
-        onSearchResults(data.docs);
+        onSearchResults(filteredMovies);
       }
       setSearchTerm("");
     } catch (error) {
@@ -36,6 +40,7 @@ const SearchBar = ({ onSearchResults }) => {
     }
     finally {
       setLoading(false);
+      setSearchTerm("");
     }
   };
 
@@ -45,12 +50,12 @@ const SearchBar = ({ onSearchResults }) => {
       <div className='searchBar'>
         <div className="wrap-input-8">
           <input className="input" type="search" placeholder="Search Movie or Title" value={searchTerm}
-            onChange={handleInputChange} />
+            onChange={handleInputChange} required/>
           <span className="focus-border">
             <i></i>
           </span>
         </div>
-        <button onClick={handleSearch} className='searchBar-button' type='search' required="true">Search</button>
+        <button onClick={handleSearch} className='searchBar-button' type='button'>Search</button>
       </div>
 
       <div>
